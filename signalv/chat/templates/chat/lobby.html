@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lobby</title>
+</head>
+<body>
+    <h1>Let's chat</h1>
+
+    <form name="chat" autocomplete="off">
+        <label for="chat-message">Enter message</label>
+        <input type="text" name="chat-message" placeholder="Enter message here"/>
+        <input type="submit" value="send">
+    </form>
+
+    <div id="messages"></div>
+
+
+    <script type="text/javascript">
+        const messageCreate = (content) => {
+            const mm = document.createElement('p');
+            mm.innerText = content;
+            document.getElementById('messages').prepend(mm);
+        };
+
+        const url = `ws://${window.location.host}/ws/socket-server/`;
+
+        const socket = new WebSocket(url);
+
+        socket.addEventListener('message', (event_) => {
+            const m = JSON.parse(event_.data);
+
+            if (m.type === 'new_message') {
+                messageCreate(m.content);
+            }
+        });
+
+        const cf = document.forms['chat'];
+
+        cf.addEventListener('submit', (event_) => {
+            event_.preventDefault();
+            const f = new FormData(cf);
+            const message = f.get('chat-message');
+            socket.send(JSON.stringify({message: message}));
+            cf.reset();
+        })
+
+
+    </script>
+
+</body>
+</html>

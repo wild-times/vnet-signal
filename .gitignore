@@ -1,0 +1,5 @@
+*.bat
+env/*
+*.pyc
+*.sqlite3
+signalv/.idea/*

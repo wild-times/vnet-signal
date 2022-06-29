@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HOME</title>
+</head>
+
+<body>
+
+    <h1>Welcome to VNET testing</h1>
+    <div>
+        <h3>Generate code and share to connect</h3>
+        <h2 id="code"></h2>
+        <button id="gen-code">Generate code and join</button>
+    </div>
+    <span>or</span>
+    <form name="join-form">
+        <label for="join-code">Enter join code</label>
+        <input type="number" name="code" id="join-code">
+        <input type="submit" value="join room">
+    </form>
+
+    <div>
+        <p>Status <span id="status"></span></p>
+    </div>
+
+
+    <script type="text/javascript">
+        const joinSignalingChannel = (code) => {
+            const url = `ws://${window.location.host}/sig/chn/${code}/`;
+            const chn = new WebSocket(url);
+
+            chn.addEventListener('message', (event_) => {
+                console.log(JSON.parse(event_.data));
+            });
+        };
+
+        // generate code and join the connection
+        document.getElementById('gen-code').addEventListener('click', (event_) => {
+            const button = event_.target;
+            button.disabled = true;
+
+            const code = Math.floor(Math.random() * (1000000 - 100000 + 1) + 100000);
+            document.getElementById('code').innerText = code.toString();
+
+            // here is when yee shall join the connection
+            joinSignalingChannel(code);
+        });
+
+        // join an existing connection/room
+        document.forms['join-form'].addEventListener('submit', (event_) => {
+            event_.preventDefault();
+
+            const f = new FormData(event_.target);
+            [event_.target[0], event_.target[1]].forEach((el) => el.disabled = true);
+
+            // here is where yee joins a connection
+            joinSignalingChannel(f.get('code'))
+        })
+    </script>
+
+
+
+</body>
+</html>
